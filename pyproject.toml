@@ -1,0 +1,94 @@
+[build-system]
+build-backend = "hatchling.build"
+requires = [ "hatchling" ]
+
+[project]
+name = "cuda-zarr"
+version = "0.0.1"
+description = "A Zarr store and codecs for cuda."
+readme = "README.md"
+license = { file = "LICENSE" }
+maintainers = [
+  { name = "Ilan Gold", email = "ilan.gold@helmholtz-munich.de" },
+]
+authors = [
+  { name = "Ilan Gold" },
+]
+requires-python = ">=3.10"
+classifiers = [
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+]
+dependencies = [
+  "zarr",
+]
+optional-dependencies.cuda12 = [
+  "cupy-cuda12x",
+  "kvikio-cu12",
+]
+optional-dependencies.dev = [
+  "pre-commit",
+  "twine>=4.0.2",
+]
+optional-dependencies.doc = [ "myst-parser", "sphinx>=7.4.6" ]
+optional-dependencies.test = [
+  "coverage",
+  "pytest",
+  "pytest-asyncio",
+  "rangehttpserver",
+  "zarr[test]",
+]
+# https://docs.pypi.org/project_metadata/#project-urls
+urls.Documentation = "https://cuda-zarr.readthedocs.io/"
+urls.Homepage = "https://github.com/ilan-gold/cuda-zarr"
+urls.Source = "https://github.com/ilan-gold/cuda-zarr"
+
+[tool.ruff]
+src = [ "src", "tests" ]
+
+format.docstring-code-format = true
+lint.select = [
+  "E",       # Error detected by Pycodestyle
+  "F",       # Errors detected by Pyflakes
+  "FBT",     # No positional boolean parameters
+  "I",       # isort
+  "ICN",     # Follow import conventions
+  "PLR0917", # Ban APIs with too many positional parameters
+  "PT",      # Pytest style
+  "PTH",     # Pathlib instead of os.path
+  "SIM",     # Simplify control flow
+  "TCH",     # manage type checking blocks
+  "TID251",  # Banned imports
+  "UP",      # pyupgrade
+  "W",       # Warning detected by Pycodestyle
+]
+lint.ignore = [
+  # E266 too many leading '#' for block comment -> Scanpy allows them for comments into sections
+  "E262",
+  # module level import not at top of file -> required to circumvent circular imports for Scanpys API
+  "E402",
+  # line too long -> we accept long comment lines; black gets rid of long code lines
+  "E501",
+  # allow I, O, l as variable names -> I is the identity matrix, i, j, k, l is reasonable indexing notation
+  "E741",
+]
+lint.per-file-ignores."**/*.pyi" = [ "ICN001" ]
+lint.isort.known-first-party = [ "zarrs" ]
+
+[tool.pytest.ini_options]
+testpaths = [ "tests" ]
+xfail_strict = true
+asyncio_mode = "auto"
+
+addopts = [
+  "--import-mode=importlib", # allow using test files with same name
+]
+
+[tool.coverage.run]
+source = [ "cuda-zarr" ]
+omit = [
+  "**/test_*.py",
+]
