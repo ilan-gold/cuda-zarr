@@ -35,10 +35,12 @@ optional-dependencies.dev = [
 ]
 optional-dependencies.doc = [ "myst-parser", "sphinx>=7.4.6" ]
 optional-dependencies.test = [
+  "aiohttp",
   "coverage",
   "pytest",
   "pytest-asyncio",
   "rangehttpserver",
+  "requests",
   "zarr[test]",
 ]
 # https://docs.pypi.org/project_metadata/#project-urls
