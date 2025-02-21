@@ -44,3 +44,12 @@ repos:
           Fix the merge conflicts manually and remove the .rej files.
         language: fail
         files: '.*\.rej$'
+  - repo: local
+    hooks:
+      - id: pytest
+        name: pytest
+        entry: pytest
+        language: system
+        types: [python]
+        pass_filenames: false
+        always_run: true
