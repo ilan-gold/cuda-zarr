@@ -5,7 +5,7 @@
 [![Downloads](https://static.pepy.tech/badge/cuda-zarr)](https://pepy.tech/project/cuda-zarr)
 [![Stars](https://img.shields.io/github/stars/ilan-gold/cuda-zarr?style=flat&logo=github&color=yellow)](https://github.com/ilan-gold/cuda-zarr/stargazers)
 
-A simple `zarr-python` [v3 compatible store](https://zarr.readthedocs.io/en/stable/user-guide/storage.html#developing-custom-stores) that uses the `CuFile` API: https://docs.rapids.ai/api/kvikio/stable/quickstart/
+Two `zarr-python` [v3 compatible stores](https://zarr.readthedocs.io/en/stable/user-guide/storage.html#developing-custom-stores) using `kvikio` for remote and local data: https://docs.rapids.ai/api/kvikio/stable/quickstart/
 plus (at least one) codec(s).
 
 ## install
