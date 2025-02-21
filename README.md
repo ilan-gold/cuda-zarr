@@ -8,7 +8,7 @@
 A simple `zarr-python` [v3 compatible store](https://zarr.readthedocs.io/en/stable/user-guide/storage.html#developing-custom-stores) that uses the `CuFile` API: https://docs.rapids.ai/api/kvikio/stable/quickstart/
 plus (at least one) codec(s).
 
-## install (once on pypi)
+## install
 
 ```shell
 uv pip install cuda-zarr[cuda12]
