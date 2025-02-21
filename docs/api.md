@@ -20,5 +20,5 @@ Codecs:
 .. autosummary::
    :toctree: generated/
 
-   LZ4GPU
+   ZstdGPU
 ```

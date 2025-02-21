@@ -6,9 +6,9 @@ import zarr
 import zarr.codecs
 from zarr.registry import register_codec
 
-from cuda_zarr import LZ4GPU, CuFileStore
+from cuda_zarr import CuFileStore, ZstdGPU
 
-register_codec("zstd", LZ4GPU)
+register_codec("zstd", ZstdGPU)
 
 
 @pytest.fixture(params=list(range(22)))
@@ -50,7 +50,7 @@ def gpu_array_path(tmp_path, level, memory_array, checksum):
         tmp_path,
         shape=memory_array.shape,
         dtype=memory_array.dtype,
-        compressors=[LZ4GPU(level=level, checksum=checksum)],
+        compressors=[ZstdGPU(level=level, checksum=checksum)],
     )
     z[...] = memory_array
     return tmp_path
@@ -71,7 +71,7 @@ def uncompressed_array_path(tmp_path, memory_array):
 def test_roundtrip_from_cpu_with_gpu(array_path, memory_array):
     with zarr.config.set(
         {
-            "codecs.zstd": f"{LZ4GPU.__module__}.{LZ4GPU.__name__}",
+            "codecs.zstd": f"{ZstdGPU.__module__}.{ZstdGPU.__name__}",
             "buffer": "zarr.core.buffer.gpu.Buffer",
             "ndbuffer": "zarr.core.buffer.gpu.NDBuffer",
         }
@@ -83,7 +83,7 @@ def test_roundtrip_from_cpu_with_gpu(array_path, memory_array):
 def test_roundtrip_from_gpu_with_gpu(gpu_array_path, memory_array):
     with zarr.config.set(
         {
-            "codecs.zstd": f"{LZ4GPU.__module__}.{LZ4GPU.__name__}",
+            "codecs.zstd": f"{ZstdGPU.__module__}.{ZstdGPU.__name__}",
             "buffer": "zarr.core.buffer.gpu.Buffer",
             "ndbuffer": "zarr.core.buffer.gpu.NDBuffer",
         }

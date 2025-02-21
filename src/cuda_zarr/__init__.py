@@ -1,4 +1,4 @@
-from .codecs import LZ4GPU
+from .codecs import ZstdGPU
 from .store import CuFileStore, RemoteCuFileStore
 
-__all__ = ["CuFileStore", "RemoteCuFileStore", "LZ4GPU"]
+__all__ = ["CuFileStore", "RemoteCuFileStore", "ZstdGPU"]

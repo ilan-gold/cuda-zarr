@@ -16,12 +16,12 @@ uv pip install cuda-zarr[cuda12]
 
 ## usage
 
-Nvidia's documentation on how level/checksum are used in LZ4 (the only exported codec here) is quite sparse, but testing seems to show levels 1-22 all work. This codec only seems to work when used either roundtrip i.e., data is read and written using it, or only read. If you write data with this, it seems you can't read it back in with CPU data.
+Nvidia's documentation on how level/checksum are used in Zstd (the only exported codec here) is quite sparse ([here](https://docs.nvidia.com/cuda/nvcomp/c_api.html#zstd)?), but testing seems to show levels 1-22 all work. This codec only seems to work when used either roundtrip i.e., data is read and written using it, or only read. If you write data with this, it seems you can't read it back in with CPU data.
 
 ```python
-from cuda_zarr import LZ4GPU, CuFileStore, RemoteCuFileStore
-register_codec("zstd", LZ4GPU)
-zarr.config.set({'codecs.zstd': f"{LZ4GPU.__module__}.{LZ4GPU.__name__}", "buffer": "zarr.core.buffer.gpu.Buffer", "ndbuffer": "zarr.core.buffer.gpu.NDBuffer"})
+from cuda_zarr import ZstdGPU, CuFileStore, RemoteCuFileStore
+register_codec("zstd", ZstdGPU)
+zarr.config.set({'codecs.zstd': f"{ZstdGPU.__module__}.{ZstdGPU.__name__}", "buffer": "zarr.core.buffer.gpu.Buffer", "ndbuffer": "zarr.core.buffer.gpu.NDBuffer"})
 store = CuFileStore('/path/to/store')
 remote_store = RemoteCuFileStore.from_url("http://my_remote_data_server.com/path/to/the/store.zarr")
 ...

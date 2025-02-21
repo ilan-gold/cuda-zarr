@@ -4,7 +4,7 @@ import zarr
 from kvikio.nvcomp_codec import NvCompBatchCodec
 
 
-class LZ4GPU(zarr.codecs.ZstdCodec):
+class ZstdGPU(zarr.codecs.ZstdCodec):
     """
 
     See https://zarr.readthedocs.io/en/stable/api/zarr/codecs/index.html#zarr.codecs.ZstdCodec
