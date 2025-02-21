@@ -20,10 +20,11 @@ Nvidia's documentation on how level/checksum are used in Zstd (the only exported
 
 ```python
 from cuda_zarr import ZstdGPU, CuFileStore, RemoteCuFileStore
-from zarr.registry import register_codec
+import zarr
 
-register_codec("zstd", ZstdGPU)
+zarr.register_codec("zstd", ZstdGPU)
 zarr.config.set({'codecs.zstd': f"{ZstdGPU.__module__}.{ZstdGPU.__name__}", "buffer": "zarr.core.buffer.gpu.Buffer", "ndbuffer": "zarr.core.buffer.gpu.NDBuffer"})
+
 store = CuFileStore('/path/to/store')
 remote_store = RemoteCuFileStore.from_url("http://my_remote_data_server.com/path/to/the/store.zarr")
 ...
