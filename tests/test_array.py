@@ -78,6 +78,7 @@ def test_roundtrip_from_cpu_with_gpu(array_path, memory_array):
     ):
         z = zarr.open_array(CuFileStore(array_path))
         assert (z[...].get() == memory_array).all()
+        assert isinstance(z.compressors[0], ZstdGPU)
 
 
 def test_roundtrip_from_gpu_with_gpu(gpu_array_path, memory_array):
@@ -90,6 +91,7 @@ def test_roundtrip_from_gpu_with_gpu(gpu_array_path, memory_array):
     ):
         z = zarr.open_array(CuFileStore(gpu_array_path))
         assert (z[...].get() == memory_array).all()
+        assert isinstance(z.compressors[0], ZstdGPU)
 
 
 def test_roundtrip_uncompressed(uncompressed_array_path, memory_array):
