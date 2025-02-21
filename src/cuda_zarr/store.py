@@ -1,9 +1,9 @@
 import asyncio
+from importlib.util import find_spec
 from pathlib import Path
 from typing import Literal
 
 import cupy as cp
-import s3fs
 import zarr
 from kvikio import CuFile, RemoteFile
 from zarr.abc.store import (
@@ -148,12 +148,19 @@ class RemoteCuFileStore(FsspecStore):
         if not self._is_open:
             await self._open()
         path = _dereference_path(self.path, key)
-        if isinstance(self.fs, s3fs.core.S3FileSystem):
-            path = "s3://" + path
+        has_s3_fs = find_spec("s3fs")
+        if has_s3_fs:
+            import s3fs
+
+            if isinstance(self.fs, s3fs.core.S3FileSystem):
+                path = "s3://" + path
         if path.startswith("http"):
             protocol = "http"
         elif path.startswith("s3"):
-            protocol = "s3"
+            if has_s3_fs:
+                protocol = "s3"
+            else:
+                raise ValueError("Install `s3fs` if you wish to use `s3` as a prefix")
         else:
             raise ValueError(f"Bad protocol {path}")
         try:
