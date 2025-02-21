@@ -11,7 +11,7 @@ from cuda_zarr import CuFileStore, ZstdGPU
 register_codec("zstd", ZstdGPU)
 
 
-@pytest.fixture(params=list(range(22)))
+@pytest.fixture(params=list(range(-7, 23)))
 def level(request):
     return request.param
 
