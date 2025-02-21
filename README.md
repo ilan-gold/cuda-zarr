@@ -16,7 +16,7 @@ uv pip install cuda-zarr[cuda12]
 
 ## usage
 
-Nvidia's documentation on how level/checksum are used is quite sparse, but testing seems to show levels 1-22 all work. This codec only seems to work when used either roundtrip i.e., data is read and written using it, or only read. If you write data with this, it seems you can't read it back in with CPU data.
+Nvidia's documentation on how level/checksum are used in LZ4 (the only exported codec here) is quite sparse, but testing seems to show levels 1-22 all work. This codec only seems to work when used either roundtrip i.e., data is read and written using it, or only read. If you write data with this, it seems you can't read it back in with CPU data.
 
 ```python
 from cuda_zarr import LZ4GPU, CuFileStore, RemoteCuFileStore
