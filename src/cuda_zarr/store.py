@@ -1,4 +1,5 @@
 import asyncio
+import math
 from importlib.util import find_spec
 from pathlib import Path
 from typing import Literal
@@ -15,6 +16,11 @@ from zarr.abc.store import (
 from zarr.core.buffer import BufferPrototype
 from zarr.core.buffer.gpu import Buffer
 from zarr.storage import FsspecStore, LocalStore
+
+
+# See note: https://docs.rapids.ai/api/kvikio/stable/api/#kvikio.cufile.CuFile.pread
+def intround(x: int, base: int, mode: Literal["up", "down"] = "down"):
+    return int(base * (math.floor if mode == "down" else math.ceil)(x / base))
 
 
 def _get(
@@ -40,24 +46,35 @@ def _get(
         if isinstance(byte_range, RangeByteRequest):
             if byte_range.end - byte_range.start < 0 or nbytes - byte_range.start < 0:
                 return Buffer.create_zero_length()
-            size = min(byte_range.end - byte_range.start, nbytes - byte_range.start)
+            true_start = byte_range.start
+            offset_start = intround(true_start, 4096, "down")
+            size = min(byte_range.end - offset_start, nbytes - offset_start)
             b = cp.empty((size,), dtype="int8")
-            handle.pread(b, size=size, file_offset=byte_range.start).get()
-            return Buffer.from_array_like(b)
+            handle.pread(b, size=size, file_offset=offset_start).get()
+            return Buffer.from_array_like(b[(true_start - offset_start) :])
         elif isinstance(byte_range, OffsetByteRequest):
             if nbytes - byte_range.offset < 0:
                 return Buffer.create_zero_length()
-            size = nbytes - byte_range.offset
+            true_start = byte_range.offset
+            offset_start = intround(true_start, 4096, "down")
+            size = nbytes - offset_start
             b = cp.empty((size,), dtype="int8")
-            handle.pread(b, size=size, file_offset=byte_range.offset).get()
-            return Buffer.from_array_like(b)
+            handle.pread(b, size=size, file_offset=offset_start).get()
+            return Buffer.from_array_like(b[(true_start - offset_start) :])
         elif isinstance(byte_range, SuffixByteRequest):
             if nbytes - byte_range.suffix < 0:
                 return Buffer.create_zero_length()
-            size = byte_range.suffix
+            size = intround(byte_range.suffix, 4096, "up")
+            if size > nbytes:
+                size = nbytes
+                true_start = nbytes - byte_range.suffix
+                offset_start = 0
+            else:
+                true_start = nbytes - byte_range.suffix
+                offset_start = nbytes - size
             b = cp.empty((size,), dtype="int8")
             handle.pread(b, size=size, file_offset=nbytes - size).get()
-            return Buffer.from_array_like(b)
+            return Buffer.from_array_like(b[(true_start - offset_start) :])
         else:
             raise TypeError(f"Unexpected byte_range, got {byte_range}.")
 
