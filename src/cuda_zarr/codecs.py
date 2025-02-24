@@ -27,8 +27,6 @@ class ZstdGPU(zarr.codecs.ZstdCodec):
         chunks_and_specs: Iterable[tuple[Buffer | None, ArraySpec]],
     ) -> Iterable[Buffer | None]:
         chunks_and_specs_list = [cs for cs in chunks_and_specs]
-        if len(chunks_and_specs_list) == 0:
-            return [None for _ in chunks_and_specs]
         input_bytes = [
             chunk_bytes.as_array_like()
             for (chunk_bytes, _) in chunks_and_specs_list
@@ -49,8 +47,6 @@ class ZstdGPU(zarr.codecs.ZstdCodec):
         chunks_and_specs: Iterable[tuple[Buffer | None, ArraySpec]],
     ) -> Iterable[Buffer | None]:
         chunks_and_specs_list = [cs for cs in chunks_and_specs]
-        if len(chunks_and_specs_list) == 0:
-            return [None for _ in chunks_and_specs]
         input_bytes = [
             chunk_bytes.as_array_like()
             for (chunk_bytes, _) in chunks_and_specs_list
