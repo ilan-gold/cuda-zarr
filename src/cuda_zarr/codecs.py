@@ -1,4 +1,4 @@
-import asyncio
+from collections.abc import Iterable
 from functools import cached_property
 
 import zarr
@@ -22,22 +22,44 @@ class ZstdGPU(zarr.codecs.ZstdCodec):
     def _zstd_codec(self) -> NvCompBatchCodec:
         return NvCompBatchCodec("Zstd")
 
-    async def _decode_single(
+    async def decode(
         self,
-        chunk_bytes: Buffer,
-        chunk_spec: ArraySpec,
-    ) -> Buffer:
-        b = await asyncio.to_thread(
-            self._zstd_codec.decode, chunk_bytes.as_array_like()
-        )
-        return chunk_spec.prototype.buffer.from_array_like(b.ravel().astype("int8"))
+        chunks_and_specs: Iterable[tuple[Buffer | None, ArraySpec]],
+    ) -> Iterable[Buffer | None]:
+        chunks_and_specs_list = [cs for cs in chunks_and_specs]
+        if len(chunks_and_specs_list) == 0:
+            return [None for _ in chunks_and_specs]
+        input_bytes = [
+            chunk_bytes.as_array_like()
+            for (chunk_bytes, _) in chunks_and_specs_list
+            if chunk_bytes is not None
+        ]
+        iterable_decoded = iter(self._zstd_codec.decode_batch(input_bytes))
+        return [
+            chunk_spec.prototype.buffer.from_array_like(
+                next(iterable_decoded).astype("int8")
+            )
+            if chunk_bytes is not None
+            else None
+            for (chunk_bytes, chunk_spec) in chunks_and_specs_list
+        ]
 
-    async def _encode_single(
+    async def encode(
         self,
-        chunk_bytes: Buffer,
-        chunk_spec: ArraySpec,
-    ) -> Buffer | None:
-        b = await asyncio.to_thread(
-            self._zstd_codec.encode, chunk_bytes.as_array_like()
-        )
-        return chunk_spec.prototype.buffer.from_bytes(b)
+        chunks_and_specs: Iterable[tuple[Buffer | None, ArraySpec]],
+    ) -> Iterable[Buffer | None]:
+        chunks_and_specs_list = [cs for cs in chunks_and_specs]
+        if len(chunks_and_specs_list) == 0:
+            return [None for _ in chunks_and_specs]
+        input_bytes = [
+            chunk_bytes.as_array_like()
+            for (chunk_bytes, _) in chunks_and_specs_list
+            if chunk_bytes is not None
+        ]
+        iterable_encoded = iter(self._zstd_codec.encode_batch(input_bytes))
+        return [
+            chunk_spec.prototype.buffer.from_bytes(next(iterable_encoded))
+            if chunk_bytes is not None
+            else None
+            for (chunk_bytes, chunk_spec) in chunks_and_specs_list
+        ]
