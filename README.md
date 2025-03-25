@@ -1,6 +1,7 @@
 # cuda-zarr
 
-> [!NOTE]  `kvikio` has/will have support for the functionality contained in this package.  Please use their implementation https://github.com/rapidsai/kvikio/pull/646 as I will personally be using it and encouraging others to do so as well.
+> [!NOTE]
+`kvikio` has/will have support for the functionality contained in this package.  Please use their implementation https://github.com/rapidsai/kvikio/pull/646 as I will personally be using it and encouraging others to do so as well.
 
 [![PyPI](https://img.shields.io/pypi/v/cuda-zarr.svg)](https://pypi.org/project/cuda-zarr)
 [![Downloads](https://static.pepy.tech/badge/cuda-zarr/month)](https://pepy.tech/project/cuda-zarr)
